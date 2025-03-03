@@ -1,0 +1,3 @@
+/Users/arutunyandavid/Desktop/OS/chat_on_sokets/cmake-build-debug/CMakeFiles/chat_on_sokets.dir
+/Users/arutunyandavid/Desktop/OS/chat_on_sokets/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/arutunyandavid/Desktop/OS/chat_on_sokets/cmake-build-debug/CMakeFiles/rebuild_cache.dir

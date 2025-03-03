@@ -1,0 +1,4 @@
+# ninja log v6
+1	567	1740850627853985040	CMakeFiles/chat_on_sokets.dir/client.cpp.o	709c1bf65f2bf4b3
+2	569	1740850627855070770	CMakeFiles/chat_on_sokets.dir/server.cpp.o	3bb1e049a0c89581
+10	516	1740850764293051244	CMakeFiles/chat_on_sokets.dir/server.cpp.o	3bb1e049a0c89581
