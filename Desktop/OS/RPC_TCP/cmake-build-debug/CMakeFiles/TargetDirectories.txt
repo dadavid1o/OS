@@ -1,0 +1,3 @@
+/Users/arutunyandavid/Desktop/OS/RPC_TCP/cmake-build-debug/CMakeFiles/RPC_TCP.dir
+/Users/arutunyandavid/Desktop/OS/RPC_TCP/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/arutunyandavid/Desktop/OS/RPC_TCP/cmake-build-debug/CMakeFiles/rebuild_cache.dir
