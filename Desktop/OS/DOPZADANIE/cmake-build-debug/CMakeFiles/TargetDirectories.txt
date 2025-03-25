@@ -1,0 +1,3 @@
+/Users/arutunyandavid/Desktop/OS/DOPZADANIE/cmake-build-debug/CMakeFiles/DOPZADANIE.dir
+/Users/arutunyandavid/Desktop/OS/DOPZADANIE/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/arutunyandavid/Desktop/OS/DOPZADANIE/cmake-build-debug/CMakeFiles/rebuild_cache.dir
