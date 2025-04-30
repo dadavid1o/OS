@@ -1,3 +1,0 @@
-/Users/arutunyandavid/Desktop/OS/Bank/cmake-build-debug/CMakeFiles/Bank.dir
-/Users/arutunyandavid/Desktop/OS/Bank/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/arutunyandavid/Desktop/OS/Bank/cmake-build-debug/CMakeFiles/rebuild_cache.dir
