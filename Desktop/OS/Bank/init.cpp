@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    size_t size = sizeof(Bank) + (n - 1) * sizeof(BankCell);
+    size_t size = sizeof(Bank) + sizeof(BankCell) * n;
     if (ftruncate(fd, size) == -1) {
         perror("ftruncate failed");
         close(fd);
