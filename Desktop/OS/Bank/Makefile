@@ -1,10 +1,22 @@
-all: client init destroy
+all: client client_api server init destroy
 
-client: client.o Bank.o
-	g++ client.o Bank.o -std=c++17 -o client
+client: client.o libcolorprint.a
+	g++ client.o libcolorprint.a -std=c++17 -o client
 
-client.o: client.cpp Bank.h
-	g++ client.cpp -c -std=c++17
+client.o: client.cpp colorprint.hpp
+	g++ client.cpp colorprint.hpp -c -std=c++17
+
+client_api: client_api.o Bank.o
+	g++ client_api.o Bank.o -std=c++17 -o client_api
+
+client_api.o: client_api.cpp Bank.h
+	g++ client_api.cpp -c -std=c++17
+
+server: server.o Bank.o
+	g++ server.o Bank.o -std=c++17 -o server
+
+server.o: server.cpp Bank.h
+	g++ server.cpp -c -std=c++17
 
 init: init.o
 	g++ init.o -std=c++17 -o init
@@ -22,4 +34,4 @@ Bank.o: Bank.cpp Bank.h
 	g++ Bank.cpp -c -std=c++17
 
 clean:
-	rm -f *.o client init destroy
+	rm -f *.o client init destroy server client_api

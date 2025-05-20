@@ -1,1 +1,0 @@
-CMakeLists.txt not found in /Users/arutunyandavid/Desktop/OS/Bank Select CMakeLists.txt

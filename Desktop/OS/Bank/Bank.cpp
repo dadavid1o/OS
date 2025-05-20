@@ -37,7 +37,7 @@ void show_max_balance(const Bank* bank, int account) {
               << bank->cells[account].max_balance << " units\n";
 }
 
-void process_command(Bank* bank, const std::string& cmd) {
+bool process_command(Bank* bank, const std::string& cmd) {
     std::istringstream iss(cmd);
     std::string action;
     iss >> action;
@@ -145,12 +145,33 @@ void process_command(Bank* bank, const std::string& cmd) {
                           << value << " units\n";
             }
         }
+        else if (action == "deposit") {
+        int account, amount;
+        iss >> account >> amount;
+            if (!is_valid_account(bank, account)) {
+                std::cout << "Sorry, account " << account << " doesn't exist\n";
+            } 
+            else if (amount <= 0) {
+                std::cout << "Sorry, deposit amount must be positive\n";
+            } 
+            else if (bank->cells[account].frozen) {
+                std::cout << "Sorry, account is frozen\n";
+            }
+            else if (bank->cells[account].balance + amount > bank->cells[account].max_balance) {
+                std::cout << "Sorry, deposit would exceed account's max balance\n";
+            } 
+            else {
+                bank->cells[account].balance += amount;
+                std::cout << "Deposited " << amount << " units to account " << account << "\n";
+            }
+        }
+
         else if (action == "deposit_all") {
             int amount;
             iss >> amount;
             if (amount <= 0) {
                 std::cout << "Sorry, amount must be positive\n";
-                return;
+                return true;
             }
             for (int i = 0; i < bank->size; ++i) {
                 if (!bank->cells[i].frozen) {
@@ -164,7 +185,7 @@ void process_command(Bank* bank, const std::string& cmd) {
             iss >> amount;
             if (amount <= 0) {
                 std::cout << "Sorry, amount must be positive\n";
-                return;
+                return true;
             }
             bool can_withdraw = true;
             for (int i = 0; i < bank->size; ++i) {
@@ -195,15 +216,20 @@ void process_command(Bank* bank, const std::string& cmd) {
                       << "  unfreeze <account>        - unfreeze account\n"
                       << "  set_min <account> <X>     - set minimum balance\n"
                       << "  set_max <account> <X>     - set maximum balance\n"
+                      << "  deposit <account> <amount>     - deposit to specific account\n"
                       << "  deposit_all <amount>      - deposit to all accounts\n"
                       << "  withdraw_all <amount>     - withdraw from all accounts\n"
                       << "  help                      - show this help\n"
                       << "  exit                      - exit the program\n\n";
         }
-        else if (action != "exit") {
+        else if (action == "exit") {
+            return false;
+        }
+        else {
             std::cout << "Sorry, command not recognized. Type 'help' for the command list\n";
         }
     } catch (...) {
         std::cout << "Sorry, an error occurred while processing the command. Please check your input\n";
     }
+    return true;
 }

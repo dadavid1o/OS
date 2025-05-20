@@ -1,42 +1,81 @@
-#include <iostream>
-#include <cstdlib>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <climits>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <unistd.h>
-#include <sstream>
+#include <iostream>
 #include <string>
-#include <sys/stat.h>
-#include "Bank.h"
+#include <sstream>
+#include <cstring>
+#include <vector>
 
-int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <number_of_accounts>\n";
+#include "colorprint.hpp"
+
+const int BUFFER_SIZE = 1024;
+
+int main(int argc, char* argv[]) {
+    
+    const char* SERVER_IP = argv[1];
+    const int PORT = (std::atoi(argv[2]));
+    
+    if (argc != 3) {
+        std::cerr << "Usage: ./client <server_ip> <port>\n";
         return 1;
     }
-    int fd = shm_open("/bank", O_RDWR, 0666);
-    if (fd == -1) {
-        perror("shm_open failed");
-        return 1;
-    }
-
-    struct stat buff;
-    if (fstat(fd, &buff) == -1) {
-        perror("fstat failed");
-        close(fd);
-        return 1;
-    }
-
-    void* addr = mmap(nullptr, buff.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (addr == MAP_FAILED) {
-        perror("mmap failed");
-        close(fd);
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(sock < 0) {
+        perror("socket");
         return 1;
     }
 
-    Bank* bank = static_cast<Bank*>(addr);
-    close(fd);
+    sockaddr_in server_addr{};
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+        std::cerr << "Invalid IP address\n";
+        return 1;
+    }
 
-    std::cout << "[SUCCESS] Bank memory mapped. Total size: " << buff.st_size << " bytes.\n";
+    if (connect(sock, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        perror("connect");
+        close(sock);
+        return 1;
+    }
+    std::vector<std::string> successPatterns;
+    successPatterns.push_back("done");
+    successPatterns.push_back("successfully");
+    successPatterns.push_back("ok");
+    successPatterns.push_back("completed");
+    
+    std::vector<std::string> failPatterns;
+    failPatterns.push_back("error");
+    failPatterns.push_back("failed");
+    failPatterns.push_back("oops");
+    failPatterns.push_back("invalid");
+    
+    Painter painter(std::cout, successPatterns, failPatterns);
+
+    std::string cmd;
+    char buffer[BUFFER_SIZE];
+    
+    while (std::cout << "> ", std::getline(std::cin, cmd)) {
+
+        if (send(sock, cmd.c_str(), cmd.size(), 0) == -1) {
+            perror("send");
+            break;
+        }
+
+        if(cmd == "exit") {
+            break;
+        }
+
+        ssize_t bytes_received = recv(sock, buffer, BUFFER_SIZE - 1, 0);
+        if (bytes_received < 0) {
+            perror("recv");
+            break;
+        }
+        buffer[bytes_received] = '\0';
+        painter.printColoredLine(buffer);
+    }
+    close(sock);
     return 0;
 }

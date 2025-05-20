@@ -19,4 +19,4 @@ void show_balance(const Bank* bank, int account);
 void show_min_balance(const Bank* bank, int account);
 void show_max_balance(const Bank* bank, int account);
 
-void process_command(Bank* bank, const std::string& cmd);
+bool process_command(Bank* bank, const std::string& cmd);
