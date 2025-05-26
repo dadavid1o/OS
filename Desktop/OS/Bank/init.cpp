@@ -26,35 +26,35 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    int n = atoi(argv[1]);
+    int n = atoi(argv[1]);  // преобразование аргумента в число счетов
     if (n <= 0) {
         std::cerr << "Invalid number of accounts (must be positive)\n";
         return 1;
     }
-
+    // создание shared memory
     int fd = shm_open("/bank", O_CREAT | O_EXCL | O_RDWR, 0666);
     if (fd == -1) {
         perror("shm_open failed");
         return 1;
     }
 
-    size_t size = sizeof(Bank) + sizeof(BankCell) * n;
-    if (ftruncate(fd, size) == -1) {
+    size_t size = sizeof(Bank) + sizeof(BankCell) * n; // вычисляем размер памяти
+    if (ftruncate(fd, size) == -1) { // установка размера объекта
         perror("ftruncate failed");
         close(fd);
         return 1;
     }
-
+    // отображение памяти в адресное пространство процесса
     void* addr = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED) {
         perror("mmap failed");
         close(fd);
         return 1;
     }
-
-    Bank* bank = new (addr) Bank(n);
+    // инициализация структ Bank в мемори
+    Bank* bank = new (addr) Bank(n); // плейсмент для вызыва конструктора
     for (int i = 0; i < n; ++i) {
-        new (&bank->cells[i]) BankCell();
+        new (&bank->cells[i]) BankCell(); // делаем инит каждого счета
     }
 
     close(fd);

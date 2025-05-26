@@ -15,7 +15,7 @@ struct BankCell {
 
 struct Bank {
     int size;
-    BankCell cells[1];
+    BankCell cells[1]; // гибкий массив счетов 
 };
 
 bool is_valid_account(const Bank* bank, int account) {
@@ -37,7 +37,7 @@ void show_max_balance(const Bank* bank, int account) {
               << bank->cells[account].max_balance << " units\n";
 }
 
-bool process_command(Bank* bank, const std::string& cmd) {
+bool process_command(Bank* bank, const std::string& cmd, std::ostream& out) {
     std::istringstream iss(cmd);
     std::string action;
     iss >> action;
@@ -47,7 +47,7 @@ bool process_command(Bank* bank, const std::string& cmd) {
             int account;
             iss >> account;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else {
                 show_balance(bank, account);
             }
@@ -56,7 +56,7 @@ bool process_command(Bank* bank, const std::string& cmd) {
             int account;
             iss >> account;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else {
                 show_min_balance(bank, account);
             }
@@ -65,7 +65,7 @@ bool process_command(Bank* bank, const std::string& cmd) {
             int account;
             iss >> account;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else {
                 show_max_balance(bank, account);
             }
@@ -75,27 +75,27 @@ bool process_command(Bank* bank, const std::string& cmd) {
             iss >> from >> to >> amount;
             
             if (!is_valid_account(bank, from) || !is_valid_account(bank, to)) {
-                std::cout << "Sorry, one of the specified accounts doesn't exist\n";
+                out << "Sorry, one of the specified accounts doesn't exist\n";
             } 
             else if (bank->cells[from].frozen) {
-                std::cout << "Sorry, the sender account is frozen\n";
+                out << "Sorry, the sender account is frozen\n";
             }
             else if (bank->cells[to].frozen) {
-                std::cout << "Sorry, the recipient account is frozen\n";
+                out << "Sorry, the recipient account is frozen\n";
             }
             else if (amount <= 0) {
-                std::cout << "Sorry, the transfer amount must be positive\n";
+                out << "Sorry, the transfer amount must be positive\n";
             }
             else if (bank->cells[from].balance - amount < bank->cells[from].min_balance) {
-                std::cout << "Sorry, insufficient funds in the sender account\n";
+                out << "Sorry, insufficient funds in the sender account\n";
             }
             else if (bank->cells[to].balance + amount > bank->cells[to].max_balance) {
-                std::cout << "Sorry, the transfer would exceed the recipient's maximum balance\n";
+                out << "Sorry, the transfer would exceed the recipient's maximum balance\n";
             }
             else {
                 bank->cells[from].balance -= amount;
                 bank->cells[to].balance += amount;
-                std::cout << "Successfully transferred " << amount << " units from account " 
+                out << "Successfully transferred " << amount << " units from account " 
                           << from << " to account " << to << "\n";
             }
         }
@@ -103,32 +103,32 @@ bool process_command(Bank* bank, const std::string& cmd) {
             int account;
             iss >> account;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else {
                 bank->cells[account].frozen = true;
-                std::cout << "Account " << account << " has been frozen\n";
+                out << "Account " << account << " has been frozen\n";
             }
         }
         else if (action == "unfreeze") {
             int account;
             iss >> account;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else {
                 bank->cells[account].frozen = false;
-                std::cout << "Account " << account << " has been unfrozen\n";
+                out << "Account " << account << " has been unfrozen\n";
             }
         }
         else if (action == "set_min") {
             int account, value;
             iss >> account >> value;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else if (value > bank->cells[account].max_balance) {
-                std::cout << "Sorry, minimum balance cannot exceed maximum balance\n";
+                out << "Sorry, minimum balance cannot exceed maximum balance\n";
             } else {
                 bank->cells[account].min_balance = value;
-                std::cout << "Account " << account << " minimum balance set to: " 
+                out << "Account " << account << " minimum balance set to: " 
                           << value << " units\n";
             }
         }
@@ -136,12 +136,12 @@ bool process_command(Bank* bank, const std::string& cmd) {
             int account, value;
             iss >> account >> value;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } else if (value < bank->cells[account].min_balance) {
-                std::cout << "Sorry, maximum balance cannot be less than minimum balance\n";
+                out << "Sorry, maximum balance cannot be less than minimum balance\n";
             } else {
                 bank->cells[account].max_balance = value;
-                std::cout << "Account " << account << " maximum balance set to: " 
+                out << "Account " << account << " maximum balance set to: " 
                           << value << " units\n";
             }
         }
@@ -149,20 +149,20 @@ bool process_command(Bank* bank, const std::string& cmd) {
         int account, amount;
         iss >> account >> amount;
             if (!is_valid_account(bank, account)) {
-                std::cout << "Sorry, account " << account << " doesn't exist\n";
+                out << "Sorry, account " << account << " doesn't exist\n";
             } 
             else if (amount <= 0) {
-                std::cout << "Sorry, deposit amount must be positive\n";
+                out << "Sorry, deposit amount must be positive\n";
             } 
             else if (bank->cells[account].frozen) {
-                std::cout << "Sorry, account is frozen\n";
+                out << "Sorry, account is frozen\n";
             }
             else if (bank->cells[account].balance + amount > bank->cells[account].max_balance) {
-                std::cout << "Sorry, deposit would exceed account's max balance\n";
+                out << "Sorry, deposit would exceed account's max balance\n";
             } 
             else {
                 bank->cells[account].balance += amount;
-                std::cout << "Deposited " << amount << " units to account " << account << "\n";
+                out << "Deposited " << amount << " units to account " << account << "\n";
             }
         }
 
@@ -170,7 +170,7 @@ bool process_command(Bank* bank, const std::string& cmd) {
             int amount;
             iss >> amount;
             if (amount <= 0) {
-                std::cout << "Sorry, amount must be positive\n";
+                out << "Sorry, amount must be positive\n";
                 return true;
             }
             for (int i = 0; i < bank->size; ++i) {
@@ -178,13 +178,13 @@ bool process_command(Bank* bank, const std::string& cmd) {
                     bank->cells[i].balance += amount;
                 }
             }
-            std::cout << "Successfully deposited " << amount << " units to all accounts\n";
+            out << "Successfully deposited " << amount << " units to all accounts\n";
         }
         else if (action == "withdraw_all") {
             int amount;
             iss >> amount;
             if (amount <= 0) {
-                std::cout << "Sorry, amount must be positive\n";
+                out << "Sorry, amount must be positive\n";
                 return true;
             }
             bool can_withdraw = true;
@@ -201,13 +201,13 @@ bool process_command(Bank* bank, const std::string& cmd) {
                         bank->cells[i].balance -= amount;
                     }
                 }
-                std::cout << "Successfully withdrew " << amount << " units from all accounts\n";
+                out << "Successfully withdrew " << amount << " units from all accounts\n";
             } else {
-                std::cout << "Sorry, the operation would make some account balances negative\n";
+                out << "Sorry, the operation would make some account balances negative\n";
             }
         }
         else if (action == "help") {
-            std::cout << "\nAvailable commands:\n"
+            out << "\nAvailable commands:\n"
                       << "  balance <account>         - show current balance\n"
                       << "  min_balance <account>     - show minimum balance\n"
                       << "  max_balance <account>     - show maximum balance\n"
@@ -226,10 +226,10 @@ bool process_command(Bank* bank, const std::string& cmd) {
             return false;
         }
         else {
-            std::cout << "Sorry, command not recognized. Type 'help' for the command list\n";
+            out << "Sorry, command not recognized. Type 'help' for the command list\n";
         }
     } catch (...) {
-        std::cout << "Sorry, an error occurred while processing the command. Please check your input\n";
+        out << "Sorry, an error occurred while processing the command. Please check your input\n";
     }
     return true;
 }
